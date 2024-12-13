@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess the Mexican States</title>
+    <link rel="stylesheet" href="../layoutstyles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f9;
+            color: #333;
+            padding: 20px;
+        }
+        .quiz {
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .results {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        img {
+            max-width: 200px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Guess the Mexican State by Shape</h1>
+    <div class="quiz">
+        <img id="stateImage" src="" alt="State Shape">
+        <div>
+            <button id="option1" onclick="checkAnswer(0)"></button>
+            <button id="option2" onclick="checkAnswer(1)"></button>
+            <button id="option3" onclick="checkAnswer(2)"></button>
+            <button id="option4" onclick="checkAnswer(3)"></button>
+        </div>
+    </div>
+    <div class="results">
+        <p><strong>Score:</strong> <span id="score">0</span></p>
+        <p id="feedback"></p>
+    </div>
+
+    <script>
+        const statesOfMexico = [
+            "Aguascalientes", "Baja California", "Baja California Sur", "Campeche", "Chiapas", "Chihuahua", "Coahuila", "Colima", 
+            "Durango", "Guanajuato", "Guerrero", "Hidalgo", "Jalisco", "Mexico City", "Michoacán", "Morelos", "Nayarit", "Nuevo León", 
+            "Oaxaca", "Puebla", "Querétaro", "Quintana Roo", "San Luis Potosí", "Sinaloa", "Sonora", "Tabasco", "Tamaulipas", 
+            "Tlaxcala", "Veracruz", "Yucatán", "Zacatecas"
+        ];
+
+        const stateImages = [
+            "https://thumbs.dreamstime.com/b/shape-aguascalientes-state-mexico-its-capital-isolated-white-background-topographic-relief-map-d-rendering-194960134.jpg", 
+            "https://www.shutterstock.com/image-vector/baja-california-mexico-vector-map-260nw-254612443.jpg", 
+            "https://www.shutterstock.com/image-vector/baja-california-sur-mexico-map-600nw-2538559401.jpg", 
+            "https://www.shutterstock.com/image-vector/campeche-mexico-map-shape-travel-600nw-2546101427.jpg", 
+            "https://images.squarespace-cdn.com/content/v1/64cc9696adbf064fb79201c6/1692903838881-LM1V0H4VNTK076S6MDD5/Chiapas-in-Mexico.png?format=750w", 
+            "https://www.shutterstock.com/image-vector/chihuahua-outline-map-mexico-state-260nw-1305591409.jpg", 
+            "https://cdn.vectorstock.com/i/500p/17/27/3d-map-coahuila-is-a-state-mexico-vector-33411727.jpg", 
+            "https://c8.alamy.com/comp/2CBFRGN/shape-of-colima-state-of-mexico-with-its-capital-isolated-on-white-background-bilevel-elevation-map-3d-rendering-2CBFRGN.jpg", 
+            "https://c8.alamy.com/comp/2CBFRP5/shape-of-durango-state-of-mexico-with-its-capital-isolated-on-white-background-topographic-relief-map-3d-rendering-2CBFRP5.jpg", 
+            "https://www.shutterstock.com/image-vector/guanajuato-outline-map-mexico-state-260nw-1278826990.jpg", 
+            "https://www.shutterstock.com/image-vector/guerrero-outline-map-mexico-state-260nw-1278827863.jpg", 
+            "https://www.shutterstock.com/image-vector/guerrero-outline-map-mexico-state-260nw-1278827863.jpg", 
+            "https://www.google.com/url?sa=i&url=https%3A%2F%2Fdepositphotos.com%2Fvectors%2Fjalisco-map-vector.html&psig=AOvVaw2OIEPxxN0-aRX1_r3T457d&ust=1734207669194000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCIj3jZPJpYoDFQAAAAAdAAAAABAE", 
+            "https://c8.alamy.com/comp/2BW5FWC/vector-map-mexico-city-isolated-vector-illustration-outline-eps-10-illustration-2BW5FWC.jpg", 
+            "https://c8.alamy.com/comp/2YAER0P/michoacn-of-mexico-map-shape-travel-web-concept-icon-vector-illustration-2YAER0P.jpg", 
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvN9HHxO77wqEp94x3qtPMeRU8meZQgsG1fg&s", 
+            "https://c8.alamy.com/comp/2CBFTFE/shape-of-nayarit-state-of-mexico-with-its-capital-isolated-on-white-background-satellite-imagery-3d-rendering-2CBFTFE.jpg", 
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtGGlDwsZCC2I45KSv0N3IQbRYTDDHc6pswQ&s", 
+            "https://c8.alamy.com/comp/2ACFAEF/high-quality-map-of-oaxaca-is-a-state-of-mexico-with-borders-of-the-municipalities-2ACFAEF.jpg", 
+            "https://c8.alamy.com/comp/2CBFTNF/shape-of-puebla-state-of-mexico-with-its-capital-isolated-on-white-background-satellite-imagery-3d-rendering-2CBFTNF.jpg", 
+            "https://c8.alamy.com/comp/2ACFB92/high-quality-map-of-queretaro-is-a-state-of-mexico-with-borders-of-the-municipalities-2ACFB92.jpg", 
+            "https://c8.alamy.com/comp/2CBFTP9/shape-of-quintana-roo-state-of-mexico-with-its-capital-isolated-on-white-background-colored-elevation-map-3d-rendering-2CBFTP9.jpg", 
+            "https://cdn5.vectorstock.com/i/1000x1000/67/09/mexico-province-map-state-san-luis-potosi-vector-28826709.jpg", 
+            "https://l450v.alamy.com/450v/2cbfw5b/shape-of-sinaloa-state-of-mexico-with-its-capital-isolated-on-white-background-satellite-imagery-3d-rendering-2cbfw5b.jpg", 
+            "https://thumbs.dreamstime.com/b/sonora-state-silhouette-map-isolated-white-background-mexico-328371760.jpg", 
+            "https://www.shutterstock.com/image-vector/tabasco-outline-map-mexico-state-260nw-1279192801.jpg", 
+            "https://www.shutterstock.com/image-vector/black-silhouette-tamaulipas-state-map-260nw-1937179024.jpg", 
+            "https://thumbs.dreamstime.com/b/tlaxcala-map-mexico-state-shape-tlaxcala-map-mexico-state-shape-vector-illustration-186706476.jpg", 
+            "https://c8.alamy.com/comp/2CBFWG5/shape-of-veracruz-state-of-mexico-with-its-capital-isolated-on-white-background-colored-elevation-map-3d-rendering-2CBFWG5.jpg", 
+            "https://c8.alamy.com/comp/2CBFWW1/shape-of-yucatn-state-of-mexico-with-its-capital-isolated-on-white-background-composition-of-patterned-textures-3d-rendering-2CBFWW1.jpg", 
+            "https://c8.alamy.com/comp/2CBFX0E/shape-of-zacatecas-state-of-mexico-with-its-capital-isolated-on-white-background-topographic-relief-map-3d-rendering-2CBFX0E.jpg"
+        ];
+
+        let currentQuestion = {};
+        let score = 0;
+
+        function generateQuestion() {
+            const stateIndex = Math.floor(Math.random() * statesOfMexico.length);
+            const correctState = statesOfMexico[stateIndex];
+            const options = generateOptions(correctState);
+
+            currentQuestion = {
+                correctState: correctState,
+                options: options,
+                image: stateImages[stateIndex]
+            };
+
+            document.getElementById("stateImage").src = currentQuestion.image;
+            document.getElementById("option1").textContent = currentQuestion.options[0];
+            document.getElementById("option2").textContent = currentQuestion.options[1];
+            document.getElementById("option3").textContent = currentQuestion.options[2];
+            document.getElementById("option4").textContent = currentQuestion.options[3];
+        }
+
+        function generateOptions(correctState) {
+            const options = [correctState];
+            while (options.length < 4) {
+                const randomOption = statesOfMexico[Math.floor(Math.random() * statesOfMexico.length)];
+                if (!options.includes(randomOption)) {
+                    options.push(randomOption);
+                }
+            }
+            return options.sort(() => Math.random() - 0.5);
+        }
+
+        function checkAnswer(selectedIndex) {
+            const selectedOption = currentQuestion.options[selectedIndex];
+            if (selectedOption === currentQuestion.correctState) {
+                score++;
+                document.getElementById("feedback").textContent = "Correct!";
+            } else {
+                document.getElementById("feedback").textContent = `Incorrect. The correct answer was ${currentQuestion.correctState}.`;
+            }
+            document.getElementById("score").textContent = score;
+            setTimeout(() => {
+                document.getElementById("feedback").textContent = "";
+                generateQuestion();
+            }, 2000);
+        }
+
+        window.onload = generateQuestion;
+    </script>
+    <div class="uncommon footer menu"><a href="#top">
+    <br><a href="../layout.html">Home</a> ┃ 
+    <a href="missionpics.html">Pictures From My Mission</a> ┃ 
+    <a href="td.html">My Tableau</a> ┃ 
+    <a href="video.html">My Video</a> ┃ 
+    <a href="#">Game</a> ┃ 
+    <a href="https://elifober.github.io/Resume/index.html" target="_blank">My Resume</a>
+    </div>
+</body>
+</html>
